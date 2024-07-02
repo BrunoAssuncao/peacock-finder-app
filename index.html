@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classifier</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+</head>
+<body>
+    <h1>Image Classifier</h1>
+    <video id="video" width="640" height="480" autoplay></video>
+    <button id="capture">Capture and Classify</button>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <div id="result"></div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureButton = document.getElementById('capture');
+        const resultDiv = document.getElementById('result');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Error accessing the camera", err);
+            });
+
+        captureButton.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            canvas.toBlob(blob => {
+                const formData = new FormData();
+                formData.append('image', blob, 'capture.jpg');
+
+                axios.post('classify.php', formData)
+                    .then(response => {
+                        resultDiv.textContent = `Classification: ${response.data}`;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        resultDiv.textContent = 'An error occurred during classification.';
+                    });
+            }, 'image/jpeg');
+        });
+    </script>
+</body>
+</html>
