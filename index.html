@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Classifier</title>
-    <script src="https://cdn.jsdelivr.net/npm/@gradio/client@1.2.1/dist/index.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -60,8 +59,8 @@
     </div>
     <div id="result"></div>
 
-    <script>
-        import { Client } from "@gradio/client";
+    <script type="module">
+        import Client from "https://cdn.jsdelivr.net/npm/@gradio/client@1.2.1/dist/index.min.js";
 
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
