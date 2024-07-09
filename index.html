@@ -60,7 +60,7 @@
     <div id="result"></div>
 
     <script type="module">
-        import Client from "https://cdn.jsdelivr.net/npm/@gradio/client@1.2.1/dist/index.min.js";
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@1.2.1/dist/index.min.js";
 
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
@@ -84,8 +84,13 @@
             
             canvas.toBlob(async img => {                
                 const client = await Client.connect("brunoassuncao/peacock-finder");
-                const result = await client.predict("/predict", { img });
-                resultDiv.textContent = `Classification: ${result.data}`;
+                const result = ( await client.predict("/predict", { img }) ).data[0];
+                const confidentResult = result.confidences.find(conf => { return conf.label === result.label && conf.confidence > 0.8 } );
+                if ( confidentResult ) {
+                    resultDiv.textContent = `That's a ${confidentResult.label} (${confidentResult.confidence})`;
+                } else {
+                    resultDiv.textContent = '...'
+                }
             }, 'image/jpeg');
         });
     </script>
