@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Classifier</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@gradio/client@1.2.1/dist/index.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,7 +52,7 @@
     </style>
 </head>
 <body>
-    <h1>Image Classifier</h1>
+    <h1>- Image Classifier -</h1>
     <div id="video-container">
         <video id="video" autoplay playsinline></video>
         <canvas id="canvas" style="display:none;"></canvas>
@@ -61,6 +61,8 @@
     <div id="result"></div>
 
     <script>
+        import { Client } from "@gradio/client";
+
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const captureButton = document.getElementById('capture');
@@ -81,18 +83,10 @@
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
             
-            canvas.toBlob(blob => {
-                const formData = new FormData();
-                formData.append('image', blob, 'capture.jpg');
-
-                axios.post('classify.php', formData)
-                    .then(response => {
-                        resultDiv.textContent = `Classification: ${response.data}`;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        resultDiv.textContent = 'An error occurred during classification.';
-                    });
+            canvas.toBlob(async img => {                
+                const client = await Client.connect("brunoassuncao/peacock-finder");
+                const result = await client.predict("/predict", { img });
+                resultDiv.textContent = `Classification: ${result.data}`;
             }, 'image/jpeg');
         });
     </script>
